@@ -1,0 +1,49 @@
+library(ggplot2)
+install.packages('ggthemes')
+library(ggthemes)
+install.packages('multcompView')
+library(multcompView)
+chickwts
+#calculate mean and sd and plot
+
+mean_data <- group_by(chickwts , feed) %>% 
+  summarise(mean=mean(weight), sd = sd (weight)) %>% 
+  arrange(desc(mean))
+#check this data
+tibble(mean_data)
+
+#for standard error use this.......inside summarise function....se = sd(weight)/sqrt(no. of treatments)
+library(stats)
+anova <- aov(weight~feed, data=chickwts)
+summary(anova) 
+
+tukey <- TukeyHSD(anova)
+tukey
+
+gl <- multcompLetters4(anova,tukey)
+gl
+ 
+gl <- as.data.frame.list(gl$feed)
+gl
+mean_data$gl <- gl$Letters
+
+p <- ggplot(mean_data , aes(feed,mean)) + geom_bar(stat = 'identity',aes(fill = feed),show.legend = FALSE,width = .4)+
+  geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),width=.1)+
+  geom_text(aes(label=gl, y = mean + sd), vjust = -.4) +
+  scale_fill_brewer(palette = 'BrBG', direction = 1) +
+  labs(x = 'feed type',
+       y = 'chicken weight(g)',
+       title = 'Bar Plot',
+       subtitle = 'Aesthetic',
+       fill = 'feed type') +
+  ylim(0,410) + ggthemes::theme_par() 
+p
+tiff('Barplot.tiff', units = 'in', width = 10,height = 6, res = 300, compression = 'lzw')
+p
+dev.off()
+
+
+
+
+
+ 

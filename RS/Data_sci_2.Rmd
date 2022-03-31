@@ -1,0 +1,217 @@
+---
+title: "Data_Sci_2"
+author: "Gulfam"
+date: "12/16/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+# Topic
+## Statistical Methods
+###  List of basic statistical methods
+
+*First check normality of data*
+*Secondly type of data(Parametric or non-parametric)*
+*Third choose appropriate test*
+*Purpose of data*
+
+
+
+
+
+
+
+1- shapiro wilk's method(normality)
+2- t test(independent and pairwise)
+3- ANOVA(one way , two way)
+4- ANCOVA
+5- MANOVA
+6- MANCOVA
+7- Wilcoxon rank
+8- mann whitney U test
+9- correlation (pearson and spearman)
+10- kruskul walis test
+11- regression
+12- posthoc analysis ( multiple comparison of means)
+
+
+## 1- Check the normal distributin:
+
+
+
+```{r}
+iris
+hist(iris$Sepal.Length)
+qqnorm(iris$Sepal.Length)
+x <- density(iris$Sepal.Length)
+plot(x)
+```
+
+(All these plots can tell us the data is normally distributed or not----bell shaped curve) , qqnorm 45 degree line is indicating data is normal. if there is no gaps in histogram the data is normal.)
+
+Another method is:
+
+
+```{r}
+shapiro.test(iris$Sepal.Length)
+```
+*if we take the mean difference between the assumed result value and actual result value, the p-value will be significant if assumed value is not very much similar to result value , if this difference is greater the p-value is more less than 0.05. If p-value is greater than 0.05, the distribution is not significantly different from normal distribution and data is normal.*
+
+
+##data is not normal:
+```{r}
+hist(iris$Petal.Length)
+qqnorm(iris$Petal.Width)
+shapiro.test(iris$Petal.Width)
+z <- density(iris$Petal.Length)
+plot(z)
+```
+
+
+## 2- t-Test:
+
+*comparison of mean of one or two treatments*
+###one sample t-test
+```{r}
+t.test(iris$Sepal.Length , mu = 4)
+
+```
+*mu = mean*
+
+### two sample t-test dependent(two numeric variable)
+```{r}
+t.test(iris$Sepal.Length , iris$Sepal.Width)
+boxplot(iris$Sepal.Length)
+boxplot(iris$Sepal.Width)
+```
+### two sample t-test for independent variable(one numerical and other binary)
+```{r}
+s <- subset(iris, iris$Species=='virginica' |iris$Species == 'setosa')
+     
+t.test(s$Sepal.Length ~ s$Species)
+
+```
+
+###paired t-test(both should be numeric and dependent samples,related to eachother, variance not assumed)
+
+```{r}
+t.test(iris$Sepal.Length , iris$Sepal.Width, paired = TRUE)
+```
+
+  [we have to write these p-values in the     following method
+   p < 0.01  ** (significantly different)
+    p < 0.001 ***  (highly significantly      different)]
+
+
+
+
+## 3- ANOVA:
+*Analysis of variance (ANOVA) is a statistical technique that is used to check if the means of two or more groups are significantly different from each other. ANOVA checks the impact of one or more factors by comparing the means of different samples*
+
+*Another measure to compare the samples is called a t-test. When we have only two samples, t-test and ANOVA give the same results. However, using a t-test would not be reliable in cases where there are more than 2 samples. If we conduct multiple t-tests for comparing more than two samples, it will have a compounded effect on the error rate of the result*
+
+```{r}
+
+#anova between two variables
+
+#CRS completely randomized design
+
+iris
+s <- subset(iris, iris$Species=='virginica' |iris$Species == 'setosa')
+model <- aov(Sepal.Length ~ Species , data = s)
+summary(model)               
+
+#multiple means comparison 
+#individually checking the significance
+#post_hoc test
+model_1 <- aov(Sepal.Length ~ Species , data = iris)
+    
+TukeyHSD(model_1)
+
+
+data()
+#Two way ANOVA
+
+
+
+
+model_3 <- aov(len ~ supp + as.factor(dose) , data = ToothGrowth)
+TukeyHSD(model_3)
+
+library(ggplot2)
+
+library(tidyverse)
+
+library(ggsignif)
+
+library(ggpubr)
+
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+ggplot(ToothGrowth , aes(dose , len)) + geom_boxplot() +
+  geom_signif(comparisons = list(c('.5','1'),
+                                 c('.5','2'),
+                                 c('1','2')),
+              map_signif_level = T,
+              y_position = c(35,40,45))
+
+#make factors to binary values
+
+
+# Perorm pairwise comparisons
+compare_means(len ~ dose,  data = ToothGrowth)
+
+
+# Visualize: Specify the comparisons you want
+my_comparisons <- list( c("0.5", "1"), c("1", "2"), c("0.5", "2") )
+ggboxplot(ToothGrowth, x = "dose", y = "len",
+          color = "dose", palette = "jco")+ 
+  stat_compare_means(comparisons = my_comparisons)+ # Add pairwise comparisons p-value
+  stat_compare_means(label.y = 50)     # Add global p-value
+
+
+#How to show statistical lettering on the plot
+#1-ANOVA model
+b <-chickwts
+
+model <- aov(chickwts$weight~chickwts$feed , data = chickwts)
+tukey <- TukeyHSD(model) #pairwise comparision
+tukey
+#lettering file
+#grouping data on the basis of p-value
+
+library(multcompView)
+
+abc <- multcompLetters4(model , tukey) #more than 4 comparisons
+abc
+
+#same letter are less significantly different
+
+#calculate mean
+install.packages('dplyr')
+library(dplyr)
+
+m1 <- group_by(chickwts, feed) %>% 
+  summarise(w=mean(weight),
+               std = sd(weight)) %>%
+  arrange(desc(w))
+
+m1 
+#combine a column in data.frame
+
+abc <- as.data.frame.list(abc$`chickwts$feed`)
+m1$abc <- abc$Letters
+m1
+
+library(ggplot2)
+ggplot(m1 , aes(x=feed ,y=w , fill=feed)) + geom_bar(stat = 'identity')+
+  geom_errorbar(aes(ymin=w-std ,ymax=w+std) , width=.25) +
+  geom_text(aes(label = abc , y = w+std, vjust=-.5)) + theme_void()+
+  scale_fill_manual(values = c('red',
+                               'blue',
+                               'green',
+                               'orange',
+                               'grey',
+                               'yellow')) + ylim(0,500)  
+
+```
+  

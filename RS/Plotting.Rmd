@@ -1,0 +1,159 @@
+---
+title: "Plotting"
+author: "Gulfam"
+date: "12/15/2021"
+output: html_document
+---
+1 - plot
+```{r}
+data('iris')
+plot(iris$Sepal.Length , iris$Sepal.Width)
+
+
+```
+2 - histogram
+```{r}
+hist(iris$Sepal.Length)
+
+```
+3- boxplot
+```{r}
+boxplot(iris$Sepal.Length ~ iris$Species , data = iris)
+```
+
+4 - image graPH  # matrix
+```{r}
+x <- matrix(1:120,12,10)
+
+x
+image(x)
+
+```
+
+
+5 - strip-chart # for one variable 
+```{r}
+stripchart(iris$Sepal.Length)
+```
+
+
+6- qqnorm
+```{r}
+qqnorm(iris$Sepal.Length)
+```
+
+7- scatter plot
+```{r}
+plot(iris$Sepal.Length, iris$Sepal.Width , data = iris , xlab = 'SL' , ylab = 'SW' , main = 'Plot')
+```
+
+
+8-relational plot
+```{r}
+plot(iris)
+```
+
+
+9-corrplot # all numerical variables , first calculate correlation # install corrplot
+```{r}
+library(corrplot)
+data("iris")
+x <- iris[1:150,-5]
+
+
+
+z <- cor(x)
+z
+corrplot(z , method = 'square')
+
+
+```
+
+ another diverse data set
+```{r}
+data(mtcars)
+x <- cor(mtcars)
+corrplot(x)
+```
+Number format
+```{r}
+corrplot(x,method = 'number')
+```
+upper plot
+```{r}
+corrplot(x , method = 'number', type = 'upper')
+```
+
+lower plot
+```{r}
+corrplot(x , method = 'number' ,type = 'lower')
+```
+
+order from high to low
+```{r}
+corrplot(x , method = 'square', type = 'lower' , order = 'AOE')
+```
+
+mixed corrplot
+```{r}
+corrplot.mixed(x , lower = 'number' , upper = 'pie' , order= 'AOE')
+```
+
+
+clustering
+
+```{r}
+corrplot(x , order = 'hclust' , addrect = 4)
+
+```
+
+another method
+```{r}
+library(PerformanceAnalytics)
+chart.Correlation(x , method = 'pearson' , histogram = T )
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

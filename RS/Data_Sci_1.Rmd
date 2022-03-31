@@ -1,0 +1,31 @@
+---
+title: "Data S"
+author: "Gulfam"
+date: "12/14/2021"
+output: html_document
+
+---
+```{r}
+#bar_plot
+
+library(plotly)
+x <- c('girrafes', 'oranges', 'monkeys')
+y <- c(20,14,23)
+plot_ly(type='bar' , x=x,y=y, color = x)
+
+#iris
+
+plot_ly(iris , x = ~Sepal.Width , y = ~Sepal.Length , type = 'bar', color  = ~Species , width = 2)
+
+#mean and sd by grouping data
+dt <- group_by(iris , Species) %>% 
+  summarise(means = mean(Sepal.Length))
+dt
+plot_ly(data = dt , type = 'bar', x = dt$Species , y = dt$means , color = dt$Species)
+
+
+
+```
+
+
+

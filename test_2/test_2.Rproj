@@ -1,0 +1,18 @@
+library(readxl)
+my_data <- read_excel("my_data.xls", range = "B1:H10", 
+                      col_types = c("text", "text", "text", 
+                                    "text", "numeric", "date", "numeric"))
+View(my_data)
+#stripchart
+stripchart(my_data$Age~my_data$Country)
+#histogram
+hist(my_data$Age)
+hist(my_data$Id)
+#scatter plot or plot
+plot(my_data$Age,my_data$Id)
+#qqnorm
+qqnorm(my_data$Age)
+#barplot
+barplot(my_data$Age)
+#mosaicplot
+mosaicplot(~my_data$Age+my_data$Id)
